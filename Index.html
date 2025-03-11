@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesla Stock Analysis Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+        }
+        .header {
+            background-color: #1a3c5e;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header .stock-info {
+            text-align: right;
+        }
+        .header .stock-info p {
+            margin: 0;
+            font-size: 16px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            flex: 1;
+            min-width: 300px;
+        }
+        .card h2 {
+            color: #1a3c5e;
+            font-size: 18px;
+            margin-top: 0;
+        }
+        .recommendations {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .recommendation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .recommendation.growth { background-color: #ffcc80; }
+        .recommendation.value { background-color: #f44336; color: white; }
+        .recommendation.income { background-color: #f44336; color: white; }
+        .recommendation.speculative { background-color: #4caf50; color: white; }
+        .recommendation.esg { background-color: #4caf50; color: white; }
+        .metrics {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .metric {
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            flex: 1;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>TSLA</h1>
+            <p>NASDAQ</p>
+        </div>
+        <h1>Tesla Stock Analysis Dashboard</h1>
+        <div class="stock-info">
+            <p>$265.35</p>
+            <p>52W Range: $138.80–$488.54</p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="card" style="flex: 2;">
+            <h2>Executive Summary</h2>
+            <p>Tesla maintains a dominant position in the EV market with significant technological advantages, strong brand recognition, and expanding manufacturing capacity. While the company has demonstrated impressive revenue growth (0.95% in 2024), its profitability is under pressure, with operating margins at 7.82%. Despite consistent profitability, our discounted cash flow analysis suggests the current stock price exceeds our calculated intrinsic value multiple scenarios.</p>
+        </div>
+        <div class="card">
+            <h2>Investment Recommendations</h2>
+            <div class="recommendations">
+                <div class="recommendation growth">
+                    <span>Growth</span>
+                    <span>Hold/Selective Buy</span>
+                </div>
+                <div class="recommendation value">
+                    <span>Value</span>
+                    <span>Avoid</span>
+                </div>
+                <div class="recommendation income">
+                    <span>Income</span>
+                    <span>Avoid</span>
+                </div>
+                <div class="recommendation speculative">
+                    <span>Speculative</span>
+                    <span>Selective Buy/Trade</span>
+                </div>
+                <div class="recommendation esg">
+                    <span>ESG</span>
+                    <span>Buy</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2>Financial Performance</h2>
+            <canvas id="revenueChart"></canvas>
+            <div class="metrics">
+                <div class="metric">
+                    <p>Revenue CAGR (2019-2024)</p>
+                    <p>31.8%</p>
+                </div>
+                <div class="metric">
+                    <p>Gross Margin (2024)</p>
+                    <p>17.87%</p>
+                </div>
+                <div class="metric">
+                    <p>Operating Margin (2024)</p>
+                    <p>7.82%</p>
+                </div>
+                <div class="metric">
+                    <p>Net Margin (2024)</p>
+                    <p>7.3%</p>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Valuation Analysis</h2>
+            <canvas id="valuationChart"></canvas>
+            <div class="metrics">
+                <div class="metric">
+                    <p>P/E Ratio</p>
+                    <p>80.2x</p>
+                </div>
+                <div class="metric">
+                    <p>P/S Ratio</p>
+                    <p>9.3x</p>
+                </div>
+                <div class="metric">
+                    <p>EV/EBITDA</p>
+                    <p>44.5x</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2>Technical Analysis</h2>
+            <canvas id="technicalChart"></canvas>
+        </div>
+        <div class="card">
+            <h2>Market Position</h2>
+            <canvas id="marketShareChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Revenue Chart
+        const revenueChart = new Chart(document.getElementById('revenueChart'), {
+            type: 'bar',
+            data: {
+                labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+                datasets: [
+                    {
+                        label: 'Revenue ($B)',
+                        data: [24.58, 31.54, 53.82, 81.46, 96.77, 97.69],
+                        backgroundColor: '#1a3c5e'
+                    },
+                    {
+                        label: 'Net Income ($B)',
+                        data: [0.86, 0.72, 5.52, 12.56, 14.999, 7.13],
+                        backgroundColor: '#4caf50'
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '$ Billions'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Valuation Chart
+        const valuationChart = new Chart(document.getElementById('valuationChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Best Case', 'Base Case', 'Bear Case', 'Current Price'],
+                datasets: [{
+                    label: 'Price per Share ($)',
+                    data: [767.36, 128.08, 32.41, 265.35],
+                    backgroundColor: ['#4caf50', '#1a3c5e', '#f44336', '#ffcc80']
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Price per Share ($)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Technical Chart (Placeholder - Replace with actual data)
+        const technicalChart = new Chart(document.getElementById('technicalChart'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [
+                    {
+                        label: 'Stock Price',
+                        data: [400, 380, 350, 320, 300, 280, 290, 270, 250, 260, 265, 265.35],
+                        borderColor: '#1a3c5e',
+                        fill: false
+                    },
+                    {
+                        label: '50-day SMA',
+                        data: [410, 390, 370, 340, 320, 300, 310, 290, 280, 290, 300, 300],
+                        borderColor: '#ffcc80',
+                        fill: false
+                    },
+                    {
+                        label: '200-day SMA',
+                        data: [390, 380, 360, 340, 320, 310, 300, 290, 280, 280, 280, 280],
+                        borderColor: '#4caf50',
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Price ($)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Market Share Chart
+        const marketShareChart = new Chart(document.getElementById('marketShareChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Tesla', 'BYD', 'Volkswagen Group', 'GM', 'Ford', 'Others'],
+                datasets: [{
+                    label: 'Global EV Market Share (%)',
+                    data: [19.9, 17.1, 7.9, 6.1, 5.2, 43.8],
+                    backgroundColor: ['#1a3c5e', '#4caf50', '#757575', '#ffcc80', '#f44336', '#e0e0e0']
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
